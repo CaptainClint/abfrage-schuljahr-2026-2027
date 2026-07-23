@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getSurveyPeriods } from "./survey";
+import { getSurveyPeriods, buildSubmissionRows } from "./survey";
 
 describe("getSurveyPeriods", () => {
   it("gibt nur Werktage innerhalb eines Ferienzeitraums zurück", () => {
@@ -25,5 +25,37 @@ describe("getSurveyPeriods", () => {
     const holidays = [{ name: "Außerhalb", start: "2025-01-01", end: "2025-01-10" }];
     const periods = getSurveyPeriods(holidays, "2026-08-01", "2027-08-31");
     expect(periods).toHaveLength(0);
+  });
+});
+
+describe("buildSubmissionRows", () => {
+  it("baut für jeden Ferientag und jeden Zusatztermin je eine Zeile", () => {
+    const rows = buildSubmissionRows(
+      { "2026-10-12": "normal", "2026-10-13": "keins" },
+      [{ date: "2026-12-24", kategorie: "reduziert" }],
+      "Max Mustermann",
+      "Bitte vorher anrufen",
+      "2026-09-01T10:00:00.000Z"
+    );
+    expect(rows).toHaveLength(3);
+    expect(rows).toContainEqual({
+      timestamp: "2026-09-01T10:00:00.000Z",
+      name: "Max Mustermann",
+      date: "2026-10-12",
+      kategorie: "normal",
+      kommentar: "Bitte vorher anrufen",
+    });
+    expect(rows).toContainEqual({
+      timestamp: "2026-09-01T10:00:00.000Z",
+      name: "Max Mustermann",
+      date: "2026-12-24",
+      kategorie: "reduziert",
+      kommentar: "Bitte vorher anrufen",
+    });
+  });
+
+  it("gibt eine leere Liste zurück, wenn keine Antworten und keine Zusatztermine vorhanden sind", () => {
+    const rows = buildSubmissionRows({}, [], "Max Mustermann", "", "2026-09-01T10:00:00.000Z");
+    expect(rows).toEqual([]);
   });
 });

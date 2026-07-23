@@ -47,3 +47,33 @@ export function getSurveyPeriods(
 
   return periods;
 }
+
+export type Kategorie = "normal" | "reduziert" | "keins";
+
+export interface SubmissionRow {
+  timestamp: string;
+  name: string;
+  date: string;
+  kategorie: Kategorie;
+  kommentar: string;
+}
+
+export function buildSubmissionRows(
+  ferienAntworten: Record<string, Kategorie>,
+  zusatzTermine: { date: string; kategorie: Kategorie }[],
+  name: string,
+  kommentar: string,
+  timestamp: string
+): SubmissionRow[] {
+  const rows: SubmissionRow[] = [];
+
+  for (const [date, kategorie] of Object.entries(ferienAntworten)) {
+    rows.push({ timestamp, name, date, kategorie, kommentar });
+  }
+
+  for (const termin of zusatzTermine) {
+    rows.push({ timestamp, name, date: termin.date, kategorie: termin.kategorie, kommentar });
+  }
+
+  return rows;
+}
