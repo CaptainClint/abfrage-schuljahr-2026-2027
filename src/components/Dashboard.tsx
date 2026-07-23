@@ -15,7 +15,6 @@ export default function Dashboard() {
           2026 bis August 2027.
         </p>
       </header>
-      <Legend />
       <div className="dashboard__grid">
         {months.map(({ year, month }) => (
           <MonthCard
@@ -27,6 +26,7 @@ export default function Dashboard() {
           />
         ))}
       </div>
+      <Legend />
     </div>
   );
 }
