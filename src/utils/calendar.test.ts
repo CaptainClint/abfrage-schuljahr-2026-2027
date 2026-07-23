@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isFerientag, isFeiertag, isWeekend, getDayType } from "./calendar";
+import { isFerientag, isFeiertag, isWeekend, getDayType, getMonthGrid } from "./calendar";
 
 const holidays = [{ name: "Herbstferien", start: "2026-10-12", end: "2026-10-24" }];
 const feiertage = [{ name: "Tag der Deutschen Einheit", date: "2026-10-03" }];
@@ -55,5 +55,25 @@ describe("getDayType", () => {
 
   it("erkennt einen normalen Schultag", () => {
     expect(getDayType("2026-08-04", [], [])).toBe("normal");
+  });
+});
+
+describe("getMonthGrid", () => {
+  it("erzeugt ausschließlich Wochen mit je 7 Tagen", () => {
+    const weeks = getMonthGrid(2026, 8);
+    weeks.forEach((week) => expect(week).toHaveLength(7));
+  });
+
+  it("füllt die erste Woche mit Tagen des Vormonats auf (August 2026 beginnt an einem Samstag)", () => {
+    const weeks = getMonthGrid(2026, 8);
+    expect(weeks[0][0]).toEqual({ date: "2026-07-27", day: 27, inMonth: false });
+    expect(weeks[0][5]).toEqual({ date: "2026-08-01", day: 1, inMonth: true });
+  });
+
+  it("enthält den letzten Tag des Monats mit inMonth: true", () => {
+    const weeks = getMonthGrid(2026, 8);
+    const allCells = weeks.flat();
+    const last = allCells.find((c) => c.date === "2026-08-31");
+    expect(last?.inMonth).toBe(true);
   });
 });
