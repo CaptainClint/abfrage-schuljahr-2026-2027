@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isFerientag, isFeiertag, isWeekend, getDayType, getMonthGrid } from "./calendar";
+import { isFerientag, isFeiertag, isWeekend, getDayType, getMonthGrid, getMonthRange } from "./calendar";
 
 const holidays = [{ name: "Herbstferien", start: "2026-10-12", end: "2026-10-24" }];
 const feiertage = [{ name: "Tag der Deutschen Einheit", date: "2026-10-03" }];
@@ -75,5 +75,24 @@ describe("getMonthGrid", () => {
     const allCells = weeks.flat();
     const last = allCells.find((c) => c.date === "2026-08-31");
     expect(last?.inMonth).toBe(true);
+  });
+});
+
+describe("getMonthRange", () => {
+  it("erzeugt 13 Monate von August 2026 bis August 2027", () => {
+    const months = getMonthRange(2026, 8, 2027, 8);
+    expect(months).toHaveLength(13);
+    expect(months[0]).toEqual({ year: 2026, month: 8 });
+    expect(months[12]).toEqual({ year: 2027, month: 8 });
+  });
+
+  it("wechselt bei Monat 12 korrekt ins nächste Jahr", () => {
+    const months = getMonthRange(2026, 11, 2027, 2);
+    expect(months).toEqual([
+      { year: 2026, month: 11 },
+      { year: 2026, month: 12 },
+      { year: 2027, month: 1 },
+      { year: 2027, month: 2 },
+    ]);
   });
 });

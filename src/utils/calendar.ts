@@ -62,3 +62,45 @@ export function getMonthGrid(year: number, month: number): DayCell[][] {
   }
   return weeks;
 }
+
+export interface MonthRef {
+  year: number;
+  month: number; // 1-12
+}
+
+export function getMonthRange(
+  startYear: number,
+  startMonth: number,
+  endYear: number,
+  endMonth: number
+): MonthRef[] {
+  const result: MonthRef[] = [];
+  let year = startYear;
+  let month = startMonth;
+  while (year < endYear || (year === endYear && month <= endMonth)) {
+    result.push({ year, month });
+    month += 1;
+    if (month > 12) {
+      month = 1;
+      year += 1;
+    }
+  }
+  return result;
+}
+
+export const MONTH_NAMES = [
+  "Januar",
+  "Februar",
+  "März",
+  "April",
+  "Mai",
+  "Juni",
+  "Juli",
+  "August",
+  "September",
+  "Oktober",
+  "November",
+  "Dezember",
+];
+
+export const WEEKDAY_LABELS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
