@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { getSurveyPeriods, buildSubmissionRows, type Kategorie } from "../utils/survey";
 import { schoolHolidays } from "../data/holidays";
 import { SHEETS_ENDPOINT_URL } from "../config";
@@ -27,13 +27,15 @@ export default function SurveyForm() {
   const [kommentar, setKommentar] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [nameError, setNameError] = useState(false);
+  const nextTerminId = useRef(0);
 
   const handleDayChange = (date: string, kategorie: Kategorie) => {
     setFerienAntworten((prev) => ({ ...prev, [date]: kategorie }));
   };
 
   const handleAddTermin = (date: string, kategorie: Kategorie) => {
-    setZusatzTermine((prev) => [...prev, { id: `${date}-${prev.length}`, date, kategorie }]);
+    const id = `termin-${nextTerminId.current++}`;
+    setZusatzTermine((prev) => [...prev, { id, date, kategorie }]);
   };
 
   const handleRemoveTermin = (id: string) => {
@@ -48,6 +50,11 @@ export default function SurveyForm() {
       return;
     }
     setNameError(false);
+
+    if (SHEETS_ENDPOINT_URL.includes("REPLACE_ME")) {
+      setStatus("error");
+      return;
+    }
 
     const rows = buildSubmissionRows(
       ferienAntworten,
@@ -92,7 +99,12 @@ export default function SurveyForm() {
           id="survey-name"
           type="text"
           value={name}
-          onChange={(event) => setName(event.target.value)}
+          onChange={(event) => {
+            setName(event.target.value);
+            if (event.target.value.trim()) {
+              setNameError(false);
+            }
+          }}
         />
         {nameError && <p className="survey-form__error">Bitte gib Deinen Namen an.</p>}
       </div>

@@ -39,4 +39,36 @@ describe("CustomDatesSection", () => {
     fireEvent.click(screen.getByLabelText("Termin 2026-09-15 entfernen"));
     expect(onRemove).toHaveBeenCalledWith("abc");
   });
+
+  it("löst beim Drücken von Enter im Datumsfeld onAdd aus und verhindert das Standardverhalten (Formularabsenden)", () => {
+    const onAdd = vi.fn();
+    render(<CustomDatesSection termine={[]} onAdd={onAdd} onRemove={vi.fn()} />);
+
+    const dateInput = screen.getByLabelText("Datum für weiteren Termin");
+    fireEvent.change(dateInput, { target: { value: "2026-09-15" } });
+
+    // Capture the actual dispatched (cancelable) keydown event so we can
+    // check its defaultPrevented flag after React's handler runs.
+    let capturedEvent: Event | undefined;
+    dateInput.addEventListener("keydown", (event) => {
+      capturedEvent = event;
+    });
+
+    fireEvent.keyDown(dateInput, { key: "Enter", code: "Enter" });
+
+    expect(onAdd).toHaveBeenCalledWith("2026-09-15", "keins");
+    expect(capturedEvent?.defaultPrevented).toBe(true);
+  });
+
+  it("ruft onAdd nicht auf, wenn Enter ohne gewähltes Datum gedrückt wird", () => {
+    const onAdd = vi.fn();
+    render(<CustomDatesSection termine={[]} onAdd={onAdd} onRemove={vi.fn()} />);
+
+    fireEvent.keyDown(screen.getByLabelText("Datum für weiteren Termin"), {
+      key: "Enter",
+      code: "Enter",
+    });
+
+    expect(onAdd).not.toHaveBeenCalled();
+  });
 });

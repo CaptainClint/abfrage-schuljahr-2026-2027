@@ -39,6 +39,12 @@ export default function CustomDatesSection({ termine, onAdd, onRemove }: CustomD
           aria-label="Datum für weiteren Termin"
           value={date}
           onChange={(event) => setDate(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              handleAdd();
+            }
+          }}
         />
         <select
           aria-label="Kategorie für weiteren Termin"
