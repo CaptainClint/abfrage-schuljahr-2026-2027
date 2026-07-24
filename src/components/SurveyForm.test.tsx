@@ -76,7 +76,7 @@ describe("SurveyForm", () => {
 
   it("zeigt den Bereich für weitere Termine", () => {
     render(<SurveyForm />);
-    expect(screen.getByText("Weitere Termine")).toBeInTheDocument();
+    expect(screen.getByText("Weitere Termine (z.B. bewegliche Ferientage)")).toBeInTheDocument();
   });
 
   it("entfernt genau den richtigen Termin nach Hinzufügen/Entfernen/Hinzufügen an demselben Datum", () => {

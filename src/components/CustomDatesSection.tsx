@@ -32,7 +32,7 @@ export default function CustomDatesSection({ termine, onAdd, onRemove }: CustomD
 
   return (
     <div className="custom-dates">
-      <h3 className="custom-dates__title">Weitere Termine</h3>
+      <h3 className="custom-dates__title">Weitere Termine (z.B. bewegliche Ferientage)</h3>
       <div className="custom-dates__form">
         <input
           type="date"
