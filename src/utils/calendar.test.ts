@@ -56,6 +56,12 @@ describe("getDayType", () => {
   it("erkennt einen normalen Schultag", () => {
     expect(getDayType("2026-08-04", [], [])).toBe("normal");
   });
+
+  it("markiert einen Ferientag am Wochenende als Wochenende, nicht als Ferientag", () => {
+    const sommerferien = [{ name: "Sommerferien 2026", start: "2026-07-04", end: "2026-08-15" }];
+    // 2026-08-01 ist ein Samstag und liegt innerhalb der Sommerferien
+    expect(getDayType("2026-08-01", sommerferien, [])).toBe("weekend");
+  });
 });
 
 describe("getMonthGrid", () => {

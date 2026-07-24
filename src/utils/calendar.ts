@@ -20,7 +20,7 @@ export function getDayType(
   holidays: FerienPeriode[],
   feiertage: Feiertag[]
 ): DayType {
-  if (isFerientag(dateISO, holidays)) return "ferien";
+  if (isFerientag(dateISO, holidays) && !isWeekend(dateISO)) return "ferien";
   if (isFeiertag(dateISO, feiertage)) return "feiertag";
   if (isWeekend(dateISO)) return "weekend";
   return "normal";
