@@ -57,7 +57,7 @@ export default function PeriodGroup({ period, answers, onChange }: PeriodGroupPr
                 {WEEKDAY_LABELS[weekday]} {date}
               </span>
               <select
-                aria-label={date}
+                aria-label={`${WEEKDAY_LABELS[weekday]} ${date}`}
                 value={answers[date] ?? "keins"}
                 onChange={(event) => onChange(date, event.target.value as Kategorie)}
               >

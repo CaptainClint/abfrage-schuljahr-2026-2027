@@ -24,8 +24,8 @@ describe("PeriodGroup", () => {
   it("zeigt den Zeitraumnamen und eine Zeile pro Tag", () => {
     render(<TestHarness period={period} />);
     expect(screen.getByText("Herbstferien 2026")).toBeInTheDocument();
-    expect(screen.getByLabelText("2026-10-12")).toBeInTheDocument();
-    expect(screen.getByLabelText("2026-10-13")).toBeInTheDocument();
+    expect(screen.getByLabelText("Mo 2026-10-12")).toBeInTheDocument();
+    expect(screen.getByLabelText("Di 2026-10-13")).toBeInTheDocument();
   });
 
   it("setzt per Schnellauswahl alle Tage des Zeitraums auf eine Kategorie", () => {
@@ -33,8 +33,8 @@ describe("PeriodGroup", () => {
     fireEvent.change(screen.getByLabelText("Alle Tage in Herbstferien 2026 setzen"), {
       target: { value: "normal" },
     });
-    expect(screen.getByLabelText("2026-10-12")).toHaveValue("normal");
-    expect(screen.getByLabelText("2026-10-13")).toHaveValue("normal");
+    expect(screen.getByLabelText("Mo 2026-10-12")).toHaveValue("normal");
+    expect(screen.getByLabelText("Di 2026-10-13")).toHaveValue("normal");
   });
 
   it("erlaubt danach weiterhin das individuelle Ändern eines einzelnen Tages", () => {
@@ -42,8 +42,8 @@ describe("PeriodGroup", () => {
     fireEvent.change(screen.getByLabelText("Alle Tage in Herbstferien 2026 setzen"), {
       target: { value: "normal" },
     });
-    fireEvent.change(screen.getByLabelText("2026-10-12"), { target: { value: "reduziert" } });
-    expect(screen.getByLabelText("2026-10-12")).toHaveValue("reduziert");
-    expect(screen.getByLabelText("2026-10-13")).toHaveValue("normal");
+    fireEvent.change(screen.getByLabelText("Mo 2026-10-12"), { target: { value: "reduziert" } });
+    expect(screen.getByLabelText("Mo 2026-10-12")).toHaveValue("reduziert");
+    expect(screen.getByLabelText("Di 2026-10-13")).toHaveValue("normal");
   });
 });
