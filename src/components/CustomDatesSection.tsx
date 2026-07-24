@@ -3,7 +3,7 @@ import type { Kategorie } from "../utils/survey";
 
 const KATEGORIE_LABELS: Record<Kategorie, string> = {
   normal: "Normales Angebot",
-  reduziert: "Reduziertes Angebot (Notbetreuung)",
+  reduziert: "Lunchtüten",
   keins: "Kein Essen nötig",
 };
 
