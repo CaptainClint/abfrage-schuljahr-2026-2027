@@ -24,4 +24,25 @@ describe("MonthCard", () => {
     render(<MonthCard year={2026} month={10} holidays={[]} feiertage={[]} />);
     expect(screen.getByTestId("day-2026-10-06")).toHaveClass("month-card__day--normal");
   });
+
+  it("zeigt eine Kategorie-Markierung, wenn für den Tag eine Kategorie vorliegt", () => {
+    const holidays = [{ name: "Herbstferien", start: "2026-10-12", end: "2026-10-24" }];
+    render(
+      <MonthCard
+        year={2026}
+        month={10}
+        holidays={holidays}
+        feiertage={[]}
+        categoryByDate={{ "2026-10-15": "reduziert" }}
+      />
+    );
+    expect(screen.getByTestId("day-2026-10-15-kategorie")).toHaveClass(
+      "month-card__day-kategorie--reduziert"
+    );
+  });
+
+  it("zeigt keine Kategorie-Markierung, wenn für den Tag keine Kategorie vorliegt", () => {
+    render(<MonthCard year={2026} month={10} holidays={[]} feiertage={[]} />);
+    expect(screen.queryByTestId("day-2026-10-06-kategorie")).not.toBeInTheDocument();
+  });
 });

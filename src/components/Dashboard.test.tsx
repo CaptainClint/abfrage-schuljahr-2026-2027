@@ -20,4 +20,11 @@ describe("Dashboard", () => {
     render(<Dashboard />);
     expect(screen.getByText("Essensbedarf Schuljahr 2026/2027")).toBeInTheDocument();
   });
+
+  it("reicht categoryByDate an die Monatskarten weiter", () => {
+    render(<Dashboard categoryByDate={{ "2026-10-15": "normal" }} />);
+    expect(screen.getByTestId("day-2026-10-15-kategorie")).toHaveClass(
+      "month-card__day-kategorie--normal"
+    );
+  });
 });

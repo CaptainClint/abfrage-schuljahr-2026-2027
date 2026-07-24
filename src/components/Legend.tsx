@@ -9,6 +9,18 @@ export default function Legend() {
         <span className="legend__swatch legend__swatch--feiertag" />
         Gesetzlicher Feiertag
       </div>
+      <div className="legend__item">
+        <span className="legend__swatch legend__swatch--kategorie-normal" />
+        Normales Angebot
+      </div>
+      <div className="legend__item">
+        <span className="legend__swatch legend__swatch--kategorie-reduziert" />
+        Lunchtüten
+      </div>
+      <div className="legend__item">
+        <span className="legend__swatch legend__swatch--kategorie-keins" />
+        Kein Essen nötig
+      </div>
     </div>
   );
 }

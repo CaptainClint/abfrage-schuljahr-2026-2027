@@ -1,8 +1,49 @@
+import { useRef, useState } from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import SurveyForm from "./SurveyForm";
-import { getSurveyPeriods } from "../utils/survey";
+import { getSurveyPeriods, type Kategorie } from "../utils/survey";
 import { schoolHolidays } from "../data/holidays";
+import type { ZusatzTermin } from "./CustomDatesSection";
+
+const RANGE_START = "2026-08-01";
+const RANGE_END = "2027-08-31";
+
+// SurveyForm is a controlled component (its answers/termine state is lifted
+// to App in production). This harness reproduces App's state-lifting logic
+// so the component can be exercised the same way it's actually used.
+function TestHarness() {
+  const periods = getSurveyPeriods(schoolHolidays, RANGE_START, RANGE_END);
+  const [ferienAntworten, setFerienAntworten] = useState<Record<string, Kategorie>>(() => {
+    const initial: Record<string, Kategorie> = {};
+    periods.forEach((period) => {
+      period.dates.forEach((date) => {
+        initial[date] = "keins";
+      });
+    });
+    return initial;
+  });
+  const [zusatzTermine, setZusatzTermine] = useState<ZusatzTermin[]>([]);
+  const nextTerminId = useRef(0);
+
+  return (
+    <SurveyForm
+      periods={periods}
+      ferienAntworten={ferienAntworten}
+      zusatzTermine={zusatzTermine}
+      onDayChange={(date, kategorie) =>
+        setFerienAntworten((prev) => ({ ...prev, [date]: kategorie }))
+      }
+      onAddTermin={(date, kategorie) => {
+        const id = `termin-${nextTerminId.current++}`;
+        setZusatzTermine((prev) => [...prev, { id, date, kategorie }]);
+      }}
+      onRemoveTermin={(id) =>
+        setZusatzTermine((prev) => prev.filter((termin) => termin.id !== id))
+      }
+    />
+  );
+}
 
 // The real config still points at the unconfigured placeholder endpoint at
 // this stage of the project (see src/config.ts). Tests that exercise the
@@ -23,14 +64,14 @@ describe("SurveyForm", () => {
   });
 
   it("verhindert das Absenden ohne Namen und zeigt einen Hinweis", () => {
-    render(<SurveyForm />);
+    render(<TestHarness />);
     fireEvent.click(screen.getByText("Absenden"));
     expect(screen.getByText("Bitte gib Deinen Namen an.")).toBeInTheDocument();
     expect(fetch).not.toHaveBeenCalled();
   });
 
   it("entfernt den Namens-Hinweis, sobald mit der Eingabe eines Namens begonnen wird", () => {
-    render(<SurveyForm />);
+    render(<TestHarness />);
     fireEvent.click(screen.getByText("Absenden"));
     expect(screen.getByText("Bitte gib Deinen Namen an.")).toBeInTheDocument();
 
@@ -39,7 +80,7 @@ describe("SurveyForm", () => {
   });
 
   it("sendet für jeden Ferientag eine Zeile mit Standardkategorie und zeigt eine Erfolgsmeldung", async () => {
-    render(<SurveyForm />);
+    render(<TestHarness />);
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Max Mustermann" } });
     fireEvent.click(screen.getByText("Absenden"));
 
@@ -53,7 +94,7 @@ describe("SurveyForm", () => {
     expect(options.mode).toBe("no-cors");
 
     const sentRows = JSON.parse(options.body as string);
-    const expectedPeriods = getSurveyPeriods(schoolHolidays, "2026-08-01", "2027-08-31");
+    const expectedPeriods = getSurveyPeriods(schoolHolidays, RANGE_START, RANGE_END);
     const expectedDayCount = expectedPeriods.reduce((sum, p) => sum + p.dates.length, 0);
     expect(sentRows).toHaveLength(expectedDayCount);
     expect(
@@ -63,7 +104,7 @@ describe("SurveyForm", () => {
 
   it("zeigt eine Fehlermeldung, wenn fetch fehlschlägt", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network error")));
-    render(<SurveyForm />);
+    render(<TestHarness />);
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Max Mustermann" } });
     fireEvent.click(screen.getByText("Absenden"));
 
@@ -75,12 +116,12 @@ describe("SurveyForm", () => {
   });
 
   it("zeigt den Bereich für weitere Termine", () => {
-    render(<SurveyForm />);
+    render(<TestHarness />);
     expect(screen.getByText("Weitere Termine (z.B. bewegliche Ferientage)")).toBeInTheDocument();
   });
 
   it("entfernt genau den richtigen Termin nach Hinzufügen/Entfernen/Hinzufügen an demselben Datum", () => {
-    render(<SurveyForm />);
+    render(<TestHarness />);
 
     const dateInput = screen.getByLabelText("Datum für weiteren Termin");
     const addButton = screen.getByText("Termin hinzufügen");
@@ -113,7 +154,7 @@ describe("SurveyForm", () => {
   });
 
   it("drückt Enter im Datumsfeld der weiteren Termine ohne das gesamte Formular abzusenden", () => {
-    render(<SurveyForm />);
+    render(<TestHarness />);
 
     fireEvent.change(screen.getByLabelText("Datum für weiteren Termin"), {
       target: { value: "2026-09-15" },
@@ -152,7 +193,24 @@ describe("SurveyForm mit unkonfiguriertem Sheets-Endpoint", () => {
     }));
     const { default: SurveyFormWithPlaceholder } = await import("./SurveyForm");
 
-    render(<SurveyFormWithPlaceholder />);
+    const periods = getSurveyPeriods(schoolHolidays, RANGE_START, RANGE_END);
+    const ferienAntworten: Record<string, Kategorie> = {};
+    periods.forEach((period) => {
+      period.dates.forEach((date) => {
+        ferienAntworten[date] = "keins";
+      });
+    });
+
+    render(
+      <SurveyFormWithPlaceholder
+        periods={periods}
+        ferienAntworten={ferienAntworten}
+        zusatzTermine={[]}
+        onDayChange={() => {}}
+        onAddTermin={() => {}}
+        onRemoveTermin={() => {}}
+      />
+    );
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Max Mustermann" } });
     fireEvent.click(screen.getByText("Absenden"));
 

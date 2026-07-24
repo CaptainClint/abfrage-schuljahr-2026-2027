@@ -1,9 +1,14 @@
 import { getMonthRange } from "../utils/calendar";
 import { schoolHolidays, publicHolidays } from "../data/holidays";
+import type { Kategorie } from "../utils/survey";
 import MonthCard from "./MonthCard";
 import Legend from "./Legend";
 
-export default function Dashboard() {
+interface DashboardProps {
+  categoryByDate?: Record<string, Kategorie>;
+}
+
+export default function Dashboard({ categoryByDate = {} }: DashboardProps) {
   const months = getMonthRange(2026, 8, 2027, 8);
 
   return (
@@ -23,6 +28,7 @@ export default function Dashboard() {
             month={month}
             holidays={schoolHolidays}
             feiertage={publicHolidays}
+            categoryByDate={categoryByDate}
           />
         ))}
       </div>
