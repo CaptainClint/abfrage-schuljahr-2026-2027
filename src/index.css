@@ -177,6 +177,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   padding: 0.3rem 0;
   border-top: 1px solid #f0f0f0;
 }
@@ -214,6 +215,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   padding: 0.3rem 0;
   border-top: 1px solid #f0f0f0;
 }
