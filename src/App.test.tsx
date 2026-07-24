@@ -7,4 +7,9 @@ describe("App", () => {
     render(<App />);
     expect(screen.getByText("Essensbedarf Schuljahr 2026/2027")).toBeInTheDocument();
   });
+
+  it("zeigt auch das Abfrage-Formular", () => {
+    render(<App />);
+    expect(screen.getByText("Essensbedarf angeben")).toBeInTheDocument();
+  });
 });
